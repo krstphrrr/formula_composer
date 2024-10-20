@@ -1,0 +1,38 @@
+name: formula_composer
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.2 # state management
+  sqflite: ^2.3.3+1 # sqlite db
+  sqflite_common_ffi: ^2.3.3  # Add this if running on desktop or for tests
+  csv: ^6.0.0
+  path_provider: ^2.1.4 # to get db path
+  intl: ^0.19.0
+  wakelock_plus: ^1.2.8
+  file_picker: ^8.1.2  # Use the latest version available 
+  # open_file_plus: 3.4.1+1
+  permission_handler: ^11.3.1
+  flutter_slidable: ^3.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+  - assets/images/momo.jpg
+  - assets/images/4x/base_xxxhdpi.png
+  - assets/images/4x/mid-base_xxxhdpi.png
+  - assets/images/4x/mid_xxxhdpi.png
+  - assets/images/4x/none_xxxhdpi.png
+  - assets/images/4x/top_mid_xxxhdpi.png
+  - assets/images/4x/top_xxxhdpi.png
