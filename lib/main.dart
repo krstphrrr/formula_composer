@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:formula_composer/features/formula_list/data/formula_list_repositiory.dart';
 import 'package:formula_composer/features/formula_list/domain/formula_list_service.dart';
 import 'package:formula_composer/features/formula_list/state/formula_list_provider.dart';
+import 'package:formula_composer/features/ingredient_list/data/ingredient_list_repository.dart';
+import 'package:formula_composer/features/ingredient_list/domain/ingredient_list_service.dart';
 import 'core/database/database_helper.dart';
 import 'core/providers/theme_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -14,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'features/formula_add/data/formula_add_repository.dart';
 import 'features/formula_add/domain/formula_add_service.dart';
 import 'features/formula_add/state/formula_add_provider.dart';
+import 'features/ingredient_list/state/ingredient_list_provider.dart';
 
 Future<void> main() async {
 
@@ -36,13 +39,17 @@ Future<void> main() async {
   final formulaAddService = FormulaAddService(formulaAddRepository);
   final formulaAddProvider = FormulaAddProvider(formulaAddService);
 
+    final ingredientListRepository = IngredientListRepository(database);
+  final ingredientListService = IngredientListService(ingredientListRepository);
+  final ingredientListProvider = IngredientListProvider(ingredientListService);
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => formulaListProvider),
         ChangeNotifierProvider(create: (context) => formulaAddProvider),
-        // ChangeNotifierProvider(create: (context) => ingredientProvider),
+        ChangeNotifierProvider(create: (context) => ingredientListProvider),
         // ChangeNotifierProvider(create: (context) => settingsProvider)
       ],
       child: MainApp(),

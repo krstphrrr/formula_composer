@@ -66,13 +66,17 @@ class _FormulaListPageState extends State<FormulaListPage> {
               'Are you sure you want to delete this formula?'),
           actions: [
             TextButton(
-              onPressed: () =>
+              onPressed: () =>{
                   Navigator.of(context).pop(false),
+                  formulaListProvider.fetchFormulas(),
+                  },
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () =>
+              onPressed: () =>{
                   Navigator.of(context).pop(true),
+                  formulaListProvider.fetchFormulas(),
+                  },
               child: const Text('Delete'),
             ),
           ],
@@ -83,17 +87,21 @@ class _FormulaListPageState extends State<FormulaListPage> {
     if (confirm == true) {
       print("TRUEE");
       await formulaListProvider.deleteFormula(formula['id']);
-      formulaListProvider.fetchFormulas(); // Refresh the formula list after deletion
+      setState(() {
+        formulaListProvider.fetchFormulas();  // Rebuild after fetching formulas
+      }); 
     }
   }
   
 
   @override
   Widget build(BuildContext context) {
+    final formulaListProvider = Provider.of<FormulaListProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Formula List'),
-        centerTitle: true, // Center the title
+        centerTitle: true, 
       ),
       body: Consumer<FormulaListProvider>(
         builder: (context, formulaListProvider, child) {
@@ -105,7 +113,7 @@ class _FormulaListPageState extends State<FormulaListPage> {
             );
           } else if (formulaListProvider.formulas.isEmpty) {
             // Show message if no formulas are found
-            return Column(
+            return const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Row(
@@ -139,7 +147,6 @@ class _FormulaListPageState extends State<FormulaListPage> {
                       final formula = formulas[index];
                       String sub;
                       if(formula["modified_date"]==null){
-                        // DateFormat('yyyy-MM-dd').format(formula['creation_date'])
                         sub = 'Created on: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(formula['creation_date']))}, Modified on: Not yet modified';
                       } else {
                         sub = 'Created on: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(formula['creation_date']))}, Modified on: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(formula['modified_date']))}';
@@ -169,27 +176,54 @@ class _FormulaListPageState extends State<FormulaListPage> {
           }
         },
       ),
-      floatingActionButton: SizedBox(
-          height: 70, // Adjust height
-          width: 70, // Adjust width
-          child: FloatingActionButton(
+      floatingActionButton: Consumer<FormulaListProvider>(
+      builder: (context, formulaListProvider, child) {
+        final formulas = formulaListProvider.formulas;
+
+        // If the list is empty, show 'Create formula' button in the center
+        if (formulas.isEmpty) {
+          return SizedBox(
+            height: 70,
+            width: 180,
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FormulaAddPage()),
+                ).then((_) {
+                  setState(() {
+                  formulaListProvider.fetchFormulas();  // Rebuild after fetching formulas
+                });
+                });
+              },
+              label: const Text('Create Formula'), // Label for empty list
+              icon: const Icon(Icons.add), // Icon with the label
+              tooltip: 'Create a new formula',
+            ),
+          );
+        } else {
+          // If there are formulas, show 'plus' button in the bottom right
+          return FloatingActionButton(
             onPressed: () {
-              // Perform the async operation
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const FormulaAddPage()),
-              ).then((_){
-                Provider.of<FormulaListProvider>(context, listen: false).fetchFormulas();
-              });
+              ).then((_) {
+                setState(() {
+                  formulaListProvider.fetchFormulas();  // Rebuild after fetching formulas
+                });
+                });
             },
-            child: const Icon(
-              Icons.add,
-              size: 30,
-              ),
+            child: const Icon(Icons.add),
             tooltip: 'Add Formula',
-          )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat, // Position FAB in lower center
-    );
+          );
+        }
+      },
+    ),
+    floatingActionButtonLocation: formulaListProvider.formulas.isEmpty
+        ? FloatingActionButtonLocation.centerFloat // Center if empty
+        : FloatingActionButtonLocation.endFloat, // Bottom right if not empty
+  );
   }
 }
 

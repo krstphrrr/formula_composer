@@ -81,7 +81,7 @@ class _FormulaAddPageState extends State<FormulaAddPage> {
                       }).toList(),
                       onChanged: (String? newValue) {
                         formulaAddProvider.updateSelectedCategory(newValue);
-                        formulaAddProvider.formulaType.text = newValue!;
+                        // formulaAddProvider.formulaType.text = newValue!;
                         formulaAddProvider.printCategory();
                       },
                       decoration: InputDecoration(

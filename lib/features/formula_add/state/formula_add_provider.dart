@@ -34,6 +34,7 @@ class FormulaAddProvider extends ChangeNotifier {
     _notes.dispose();
     _formulaType.dispose();
     _creationDate.dispose();
+    _modifiedDate.dispose();
 
     super.dispose();
   }
@@ -43,6 +44,8 @@ class FormulaAddProvider extends ChangeNotifier {
     _notes.clear();
     _formulaType.clear();
     _creationDate.clear();
+    _modifiedDate.clear();
+    _selectedCategory=null;
      notifyListeners();
   }
 
@@ -79,6 +82,7 @@ class FormulaAddProvider extends ChangeNotifier {
 
   void updateSelectedCategory(String? categoryId) {
     _selectedCategory = categoryId;
+    // _formulaType.text = categoryId!;
 
     notifyListeners();
   }
@@ -89,8 +93,6 @@ class FormulaAddProvider extends ChangeNotifier {
    Future<void> addFormula(Map<String, dynamic> formula) async {
     await _service.addFormula(formula);
     clearControllers();
-    // await fetchFormulas();  // Refresh the list of formulas
-    // notifyListeners();
   }
 
     // Update existing formula
