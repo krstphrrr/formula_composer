@@ -25,8 +25,8 @@ class _FormulaAddPageState extends State<FormulaAddPage> {
       formulaAddProvider.formulaName.text = widget.formula!['name'];
       formulaAddProvider.notes.text = widget.formula!['notes'];
       formulaAddProvider.formulaType.text = widget.formula!['type'];
-      formulaAddProvider.creationDate.text =
-          DateTime.parse(widget.formula!['creation_date']) as String;
+      formulaAddProvider.creationDate.text = widget.formula!['creation_date']?? '';
+      formulaAddProvider.modifiedDate.text =widget.formula!['modified_date'] ?? '';
     }
   }
 
@@ -81,6 +81,7 @@ class _FormulaAddPageState extends State<FormulaAddPage> {
                       }).toList(),
                       onChanged: (String? newValue) {
                         formulaAddProvider.updateSelectedCategory(newValue);
+                        formulaAddProvider.formulaType.text = newValue!;
                         formulaAddProvider.printCategory();
                       },
                       decoration: InputDecoration(
@@ -100,42 +101,16 @@ class _FormulaAddPageState extends State<FormulaAddPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: Text(
-                    'Created on: ${formulaAddProvider.creationDate.text.isEmpty ? DateTime.now() : formulaAddProvider.creationDate.text}',
+                    'Created on: ${formulaAddProvider.creationDate.text.isEmpty ? DateFormat('yyyy-MM-dd').format(DateTime.now()) : formulaAddProvider.creationDate.text}',
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    'Created on: ${formulaAddProvider.modifiedDate.text.isEmpty ? "Not modified yet." : formulaAddProvider.modifiedDate.text}',
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Save button
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.start,
-                //   children: [
-                //     ElevatedButton(
-                //       onPressed: () async {
-                //         if (_formKey.currentState?.validate() == true) {
-                //           final formula = {
-                //             'name': formulaAddProvider.formulaName,
-                //             'creation_date': DateTime.now().toIso8601String(),
-                //             'notes': formulaAddProvider.notes,
-                //             'type': formulaAddProvider.formulaType,
-                //           };
-
-                //           // Debug: Check what is being saved
-                //           print("Saving formula: $formula");
-
-                //           // Access the provider and call the addFormula method
-                //           await formulaAddProvider.addFormula(formula);
-
-                //           // Debug: Confirm formula was saved
-                //           print("Formula saved!");
-
-                //           // Navigate back to the previous screen after saving
-                //           Navigator.pop(context);
-                //         }
-                //       },
-                //       child: const Text('Save Formula'),
-                //     ),
-                //   ],
-                // ),
               ],
             ),
           ),
@@ -148,20 +123,21 @@ class _FormulaAddPageState extends State<FormulaAddPage> {
                 if (_formKey.currentState?.validate() == true) {
                   final formula = {
                     'name': formulaAddProvider.formulaName.text,
-                    'creation_date': DateTime.now().toIso8601String(),
+                    // 'creation_date': DateTime.now().toIso8601String(),
                     'notes': formulaAddProvider.notes.text,
                     'type': formulaAddProvider.formulaType.text,
                   };
 
-                  // Debug: Check what is being saved
-                  print("Saving formula: $formula");
-
-                  // Access the provider and call the addFormula method
+                 if (widget.formula == null) {
+                  // Creating new formula
+                  formula['creation_date'] = DateTime.now().toIso8601String();
                   await formulaAddProvider.addFormula(formula);
-
-                  // Debug: Confirm formula was saved
-                  print("Formula saved!");
-
+                } else {
+                  // Updating existing formula
+                  // formula['id'] = widget.formula!['id'];
+                  formula['modified_date'] = DateTime.now().toIso8601String();
+                  await formulaAddProvider.updateFormula(widget.formula!['id'], formula);
+                }
                   // Navigate back to the previous screen after saving
                   Navigator.pop(context);
                 }
@@ -171,7 +147,7 @@ class _FormulaAddPageState extends State<FormulaAddPage> {
                 //   formulaListProvider.fetchFormulas();
                 // }
               },
-              child: const Text('Save Formula'),
+              child: Text(widget.formula?['id'] == null ? 'Save formula' : 'Update formula'),
               tooltip: 'Save Formula',
             )),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

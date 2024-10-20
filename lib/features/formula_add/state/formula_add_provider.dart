@@ -14,11 +14,13 @@ class FormulaAddProvider extends ChangeNotifier {
   TextEditingController _notes = TextEditingController();
   TextEditingController _formulaType = TextEditingController();
   TextEditingController _creationDate = TextEditingController();
+  TextEditingController _modifiedDate = TextEditingController();
 
   TextEditingController get formulaName => _formulaName;
   TextEditingController get notes => _notes;
   TextEditingController get formulaType => _formulaType;
   TextEditingController get creationDate => _creationDate;
+  TextEditingController get modifiedDate => _modifiedDate;
 
   String? _selectedCategory;
   String? get selectedCategory => _selectedCategory;
@@ -58,7 +60,12 @@ class FormulaAddProvider extends ChangeNotifier {
     notifyListeners();  // Notify listeners of the change
   }
     set creationDate(TextEditingController value) {
-    _formulaName = value;
+    _creationDate = value;
+    notifyListeners();  // Notify listeners of the change
+  }
+
+   set modifiedDate(TextEditingController value) {
+    _modifiedDate = value;
     notifyListeners();  // Notify listeners of the change
   }
 
@@ -72,10 +79,11 @@ class FormulaAddProvider extends ChangeNotifier {
 
   void updateSelectedCategory(String? categoryId) {
     _selectedCategory = categoryId;
+
     notifyListeners();
   }
   void printCategory(){
-    print(_selectedCategory);
+    print(_categories);
   }
 
    Future<void> addFormula(Map<String, dynamic> formula) async {
@@ -83,5 +91,12 @@ class FormulaAddProvider extends ChangeNotifier {
     clearControllers();
     // await fetchFormulas();  // Refresh the list of formulas
     // notifyListeners();
+  }
+
+    // Update existing formula
+  Future<void> updateFormula(int id, Map<String, dynamic> updatedFormula) async {
+    await _service.updateFormula(id, updatedFormula);
+    clearControllers();
+    // await fetchFormulas();
   }
 }

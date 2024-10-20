@@ -16,5 +16,10 @@ class FormulaAddService {
   Future<List<Map<String, dynamic>>> loadCategories() async{
     return await _repository.loadCategories();
   }
+
+  Future<void> updateFormula(int id, Map<String, dynamic> updatedFormula) async {
+    await _repository.updateFormula(id, updatedFormula);
+  }
+
   
 }

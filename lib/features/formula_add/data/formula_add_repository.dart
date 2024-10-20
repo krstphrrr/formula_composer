@@ -45,5 +45,14 @@ class FormulaAddRepository {
     return categoryData;
 // Notify listeners so that UI can update when data is loaded
   }
+
+  Future<void> updateFormula(int id, Map<String, dynamic> updatedFormula) async {
+    await db.update(
+      'formulas',
+      updatedFormula,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
   
 }

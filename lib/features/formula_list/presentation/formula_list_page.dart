@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:formula_composer/features/formula_list/presentation/formula_list_item.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../formula_add/presentation/formula_add_page.dart';
 import '../state/formula_list_provider.dart';
+
 
 class FormulaListPage extends StatefulWidget {
   const FormulaListPage({Key? key}) : super(key: key);
@@ -12,33 +15,78 @@ class FormulaListPage extends StatefulWidget {
 }
 
 class _FormulaListPageState extends State<FormulaListPage> {
+
+
   @override
   void initState() {
     super.initState();
     // Fetch formulas when the page is initialized
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<FormulaListProvider>(context, listen: false).fetchFormulas();
-    // });
+    });
   }
 
-  void openEditBox() {
-    // prefill
+  void openEditBox(int index) {
+    final formulaListProvider =
+        Provider.of<FormulaListProvider>(context, listen: false);
+    final formulas = formulaListProvider.formulas;
+    final formula = formulas[index];
 
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-            title: const Text("Edit Formula"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [],
-            )
-            // actions: [
-            //   // _cancelButton(),
-
-            //   // _saveButton()
-            // ],
-            ));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FormulaAddPage(
+          formula: {
+            'id': formula['id'],
+            'name': formula['name'],
+            'notes': formula['notes'],
+            'type': formula['type'],
+            'modified_date': formula['modified_date'],
+            'creation_date': formula['creation_date']
+          },
+        ),
+      ),
+    ).then((_){
+      Provider.of<FormulaListProvider>(context, listen: false).fetchFormulas();
+    });;
   }
+
+  void openDeleteBox(int index) async{
+    final formulaListProvider = Provider.of<FormulaListProvider>(context, listen: false);
+    final formulas = formulaListProvider.formulas;
+    final formula = formulas[index];
+
+    // Show a confirmation dialog before deletion
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Formula'),
+          content: const Text(
+              'Are you sure you want to delete this formula?'),
+          actions: [
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(context).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      print("TRUEE");
+      await formulaListProvider.deleteFormula(formula['id']);
+      formulaListProvider.fetchFormulas(); // Refresh the formula list after deletion
+    }
+  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -46,41 +94,6 @@ class _FormulaListPageState extends State<FormulaListPage> {
       appBar: AppBar(
         title: const Text('Formula List'),
         centerTitle: true, // Center the title
-
-        actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.color_lens),
-          //   onPressed: () {
-          //     themeProvider.toggleTheme(); // Switch the theme when the button is pressed
-          //   },
-          // ),
-          // Button for navigating to the ingredient list page
-          // IconButton(
-          //   icon: const Icon(Icons.list), // Choose an appropriate icon
-          //   onPressed: () {
-          //     // Navigator.push(
-          //     //   context,
-          //     //   MaterialPageRoute(builder: (context) => IngredientsListPage()),
-          //     // );
-          //   },
-          // ),
-
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () async {
-              // Perform the async operation
-              // await Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //       builder: (context) => const FormulaManagementPage()),
-              // // );
-
-              // if (mounted) {
-              //   formulaProvider.fetchFormulas();
-              // }
-            },
-          ),
-        ],
       ),
       body: Consumer<FormulaListProvider>(
         builder: (context, formulaListProvider, child) {
@@ -124,47 +137,21 @@ class _FormulaListPageState extends State<FormulaListPage> {
                     itemCount: formulas.length,
                     itemBuilder: (context, index) {
                       final formula = formulas[index];
+                      String sub;
+                      if(formula["modified_date"]==null){
+                        // DateFormat('yyyy-MM-dd').format(formula['creation_date'])
+                        sub = 'Created on: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(formula['creation_date']))}, Modified on: Not yet modified';
+                      } else {
+                        sub = 'Created on: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(formula['creation_date']))}, Modified on: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(formula['modified_date']))}';
+                      }
 
-                      return ListTile(
-                        title: Text(formula['name']),
-                        subtitle: Text('Type: ${formula['type']}'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () async {
-                            final formulaListProvider =
-                                Provider.of<FormulaListProvider>(context,
-                                    listen: false);
-                            // Show a confirmation dialog before deletion
-                            final confirm = await showDialog<bool>(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Delete Formula'),
-                                  content: const Text(
-                                      'Are you sure you want to delete this formula?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(false),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(true),
-                                      child: const Text('Delete'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-
-                            if (confirm == true) {
-                              await formulaListProvider.deleteFormula(formula['id']);
-                              formulaListProvider.fetchFormulas(); // Refresh the formula list after deletion
-                            }
-                          },
-                        ),
+                      return FormulaListItem(
+                        title: formula['name'],
+                        subtitle: sub,
+                        onEditPressed: (context) => openEditBox(index),
+                        onDeletePressed: (context) => openDeleteBox(index),
                         onTap: () {
+                          print("TAPPED");
                           // Navigator.push(
                           //   context,
                           //   MaterialPageRoute(
@@ -191,13 +178,9 @@ class _FormulaListPageState extends State<FormulaListPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const FormulaAddPage()),
-              );
-
-              if (mounted) {
-                final formulaListProvider =
-                    Provider.of<FormulaListProvider>(context, listen: false);
-                formulaListProvider.fetchFormulas();
-              }
+              ).then((_){
+                Provider.of<FormulaListProvider>(context, listen: false).fetchFormulas();
+              });
             },
             child: const Icon(
               Icons.add,
@@ -209,3 +192,4 @@ class _FormulaListPageState extends State<FormulaListPage> {
     );
   }
 }
+
