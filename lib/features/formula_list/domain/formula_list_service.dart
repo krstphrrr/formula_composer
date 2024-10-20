@@ -9,4 +9,8 @@ class FormulaListService {
   Future<List<Map<String, dynamic>>> fetchFormulas() async {
     return await _repository.fetchFormulas();
   }
+
+  Future <void> deleteFormula(int formulaId) async {
+    await _repository.deleteFormula(formulaId);
+  }
 }

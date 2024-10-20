@@ -11,6 +11,10 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // For non-mobile platform
 import 'package:wakelock_plus/wakelock_plus.dart'; // Updated to wakelock_plus
 import 'package:provider/provider.dart';
 
+import 'features/formula_add/data/formula_add_repository.dart';
+import 'features/formula_add/domain/formula_add_service.dart';
+import 'features/formula_add/state/formula_add_provider.dart';
+
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,12 +32,16 @@ Future<void> main() async {
   final formulaListService = FormulaListService(formulaListRepository);
   final formulaListProvider = FormulaListProvider(formulaListService);
 
+  final formulaAddRepository = FormulaAddRepository(database);
+  final formulaAddService = FormulaAddService(formulaAddRepository);
+  final formulaAddProvider = FormulaAddProvider(formulaAddService);
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => formulaListProvider),
-        // ChangeNotifierProvider(create: (context) => formulaIngredientProvider),
+        ChangeNotifierProvider(create: (context) => formulaAddProvider),
         // ChangeNotifierProvider(create: (context) => ingredientProvider),
         // ChangeNotifierProvider(create: (context) => settingsProvider)
       ],

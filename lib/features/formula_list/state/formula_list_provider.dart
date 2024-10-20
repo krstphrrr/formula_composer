@@ -27,4 +27,10 @@ class FormulaListProvider extends ChangeNotifier {
     notifyListeners();  // Notify UI that loading is complete
   }
 
+  Future<void> deleteFormula(int id) async {
+    await _service.deleteFormula(id);
+    await fetchFormulas();  // Refresh the list of formulas
+    // notify
+  }
+
 }
