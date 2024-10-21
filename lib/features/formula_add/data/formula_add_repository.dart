@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../core/database/database_helper.dart';
 
@@ -13,7 +14,9 @@ class FormulaAddRepository {
     try {
       final data = await db.query('formulas', where: 'id = ?', whereArgs: [id]);
       if (data.isNotEmpty) {
-        print("Fetched formula: ${data.first}");
+        if (kDebugMode) {
+          print("Fetched formula: ${data.first}");
+        }
         return data.first;
       }
     } catch (e) {

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:formula_composer/features/formula_list/presentation/formula_list_page.dart';
 import 'package:formula_composer/features/ingredient_list/presentation/ingredient_list_page.dart';
 import 'package:provider/provider.dart';
-import '../../../core/providers/theme_provider.dart';
+import '../providers/theme_provider.dart';
 
-class NavWidgetPage extends StatefulWidget {
+class MainNavBar extends StatefulWidget {
   @override
-  _NavWidgetPageState createState() => _NavWidgetPageState();
+  _MainNavBarState createState() => _MainNavBarState();
 }
 
-class _NavWidgetPageState extends State<NavWidgetPage> {
+class _MainNavBarState extends State<MainNavBar> {
   int _currentIndex = 0;
 
   // List of pages (widgets) to display in the body

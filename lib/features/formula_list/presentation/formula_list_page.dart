@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:formula_composer/features/formula_list/presentation/formula_list_item.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/widgets/custom_list_item.dart';
 import '../../formula_add/presentation/formula_add_page.dart';
 import '../../formula_add/state/formula_add_provider.dart';
 import '../state/formula_list_provider.dart';
@@ -159,7 +159,7 @@ class _FormulaListPageState extends State<FormulaListPage> {
                         sub = 'Created on: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(formula['creation_date']))}, Modified on: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(formula['modified_date']))}';
                       }
 
-                      return FormulaListItem(
+                      return CustomListItem(
                         title: formula['name'],
                         subtitle: sub,
                         onEditPressed: (context) => openEditBox(index),
@@ -233,4 +233,4 @@ class _FormulaListPageState extends State<FormulaListPage> {
   );
   }
 }
-
+// export and import logic

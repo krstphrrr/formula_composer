@@ -8,7 +8,7 @@ import 'package:formula_composer/features/ingredient_list/domain/ingredient_list
 import 'core/database/database_helper.dart';
 import 'core/providers/theme_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'features/01_nav_widget/presentation/nav_widget_page.dart';
+import 'core/widgets/main_nav_bar.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // For non-mobile platforms
 import 'package:wakelock_plus/wakelock_plus.dart'; // Updated to wakelock_plus
 import 'package:provider/provider.dart';
@@ -88,7 +88,7 @@ class MainApp extends StatelessWidget {
       // ),
     debugShowCheckedModeBanner: false,
       theme: themeProvider.currentTheme,
-      home: NavWidgetPage(),
+      home: MainNavBar(),
     );
   }
 }

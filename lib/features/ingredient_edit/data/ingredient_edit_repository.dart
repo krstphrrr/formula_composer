@@ -6,3 +6,7 @@ class IngredientEditRepository {
   IngredientEditRepository(this.db);
 
 }
+// controllers: dispose and clear
+// add ingredient / update ingredient
+// cost calc
+// substantivity calc

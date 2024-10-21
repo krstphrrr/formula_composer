@@ -3,7 +3,7 @@ import 'package:formula_composer/features/ingredient_list/state/ingredient_list_
 import 'package:provider/provider.dart';
 
 import '../../ingredient_edit/presentation/ingredient_edit_page.dart';
-import 'ingredient_list_item.dart';
+import '../../../core/widgets/custom_list_item.dart';
 
 class IngredientListPage extends StatefulWidget {
   const IngredientListPage({ Key? key }) : super(key: key);
@@ -75,7 +75,7 @@ class _IngredientListPageState extends State<IngredientListPage> {
                       final ingredient = ingredients[index];
                       String sub = '';
 
-                      return IngredientListItem(
+                      return CustomListItem(
                         title: ingredient['name'],
                         subtitle: sub,
                         onEditPressed: (context) => openEditBox(index),
@@ -149,4 +149,4 @@ class _IngredientListPageState extends State<IngredientListPage> {
   );
   }
 }
-
+//  add optional properties to custom item widget

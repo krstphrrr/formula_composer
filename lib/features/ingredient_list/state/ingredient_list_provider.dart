@@ -55,4 +55,15 @@ class IngredientListProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // filter ingredients logic
+  //  sort logic
+  // delete ingredient
+  // total number in inv 
+  // total cost 
+
+  // ingredient list item appearance: editable colors? pyramid logic? subtitles?
+  // for color chooser: custom widget
+  // export and import logic
+
 }

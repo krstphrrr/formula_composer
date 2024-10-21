@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class IngredientListItem extends StatelessWidget {
+class CustomListItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final void Function(BuildContext)? onEditPressed;
   final void Function(BuildContext)? onDeletePressed;
-  final VoidCallback? onTap; // Add onTap callback
-  // final String trailing;
-// const FormulaListItem({ Key? key }) : super(key: key);
-  const IngredientListItem({
+  final VoidCallback? onTap; 
+
+  const CustomListItem({
     super.key,
     required this.title,
     required this.subtitle,
