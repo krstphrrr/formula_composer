@@ -15,6 +15,17 @@ class FormulaListProvider extends ChangeNotifier {
   TextEditingController _searchController = TextEditingController();
   TextEditingController get searchController => _searchController;
   
+  
+   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+    void clearControllers() {
+    _searchController.clear();
+     notifyListeners();
+  }
 
   // methods
 
@@ -31,7 +42,8 @@ class FormulaListProvider extends ChangeNotifier {
   Future<void> deleteFormula(int id) async {
 
     await _service.deleteFormula(id);
-    await fetchFormulas();  
+    await fetchFormulas();
+    clearControllers();
     notifyListeners();
   }
 

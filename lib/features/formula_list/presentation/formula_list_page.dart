@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../formula_add/presentation/formula_add_page.dart';
+import '../../formula_add/state/formula_add_provider.dart';
 import '../state/formula_list_provider.dart';
 
 
@@ -48,7 +49,7 @@ class _FormulaListPageState extends State<FormulaListPage> {
       ),
     ).then((_){
       Provider.of<FormulaListProvider>(context, listen: false).fetchFormulas();
-    });;
+    });
   }
 
   void openDeleteBox(int index) async{
@@ -68,14 +69,18 @@ class _FormulaListPageState extends State<FormulaListPage> {
             TextButton(
               onPressed: () =>{
                   Navigator.of(context).pop(false),
-                  formulaListProvider.fetchFormulas(),
+                  setState(() {
+        formulaListProvider.fetchFormulas();  // Rebuild after fetching formulas
+      }),
                   },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () =>{
                   Navigator.of(context).pop(true),
-                  formulaListProvider.fetchFormulas(),
+                  setState(() {
+        formulaListProvider.fetchFormulas();  // Rebuild after fetching formulas
+      }),
                   },
               child: const Text('Delete'),
             ),
@@ -87,8 +92,10 @@ class _FormulaListPageState extends State<FormulaListPage> {
     if (confirm == true) {
       print("TRUEE");
       await formulaListProvider.deleteFormula(formula['id']);
+      
       setState(() {
         formulaListProvider.fetchFormulas();  // Rebuild after fetching formulas
+        Provider.of<FormulaAddProvider>(context, listen: false).clearControllers();
       }); 
     }
   }

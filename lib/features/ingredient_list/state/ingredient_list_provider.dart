@@ -10,8 +10,8 @@ class IngredientListProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _filteredIngredients = [];
   List<Map<String, dynamic>> get filteredIngredients => _filteredIngredients;
 
-  List<Map<String, dynamic>> _allIngredients = [];
-  List<Map<String, dynamic>> get allIngredients => _allIngredients;
+  List<Map<String, dynamic>> _ingredients = [];
+  List<Map<String, dynamic>> get ingredients => _ingredients;
 
   Map<String, dynamic>? _singleIngredientDetails = {};
   Map<String, dynamic>? get singleIngredientDetails => _singleIngredientDetails;
@@ -31,15 +31,20 @@ class IngredientListProvider extends ChangeNotifier {
 
   String? lastSortOption;
 
+  set ingredients(List<Map<String, dynamic>> value){
+    _ingredients = value;
+    notifyListeners();
+  }
+
   // methods
-  void fetchAllIngredients() async {
+  void fetchIngredients() async {
     _isLoading = true;
     _hasError = false;
     notifyListeners();
     try {
       // _casController.clear();
-      _allIngredients = await _service.fetchIngredients();
-      _filteredIngredients = _allIngredients;
+      _ingredients = await _service.fetchIngredients();
+      _filteredIngredients = _ingredients;
     } catch (e) {
       _hasError = true;
       // if (kDebugMode) {

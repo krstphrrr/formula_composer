@@ -16,6 +16,9 @@ import 'package:provider/provider.dart';
 import 'features/formula_add/data/formula_add_repository.dart';
 import 'features/formula_add/domain/formula_add_service.dart';
 import 'features/formula_add/state/formula_add_provider.dart';
+import 'features/ingredient_edit/data/ingredient_edit_repository.dart';
+import 'features/ingredient_edit/domain/ingredient_edit_service.dart';
+import 'features/ingredient_edit/state/ingredient_edit_provider.dart';
 import 'features/ingredient_list/state/ingredient_list_provider.dart';
 
 Future<void> main() async {
@@ -39,9 +42,13 @@ Future<void> main() async {
   final formulaAddService = FormulaAddService(formulaAddRepository);
   final formulaAddProvider = FormulaAddProvider(formulaAddService);
 
-    final ingredientListRepository = IngredientListRepository(database);
+  final ingredientListRepository = IngredientListRepository(database);
   final ingredientListService = IngredientListService(ingredientListRepository);
   final ingredientListProvider = IngredientListProvider(ingredientListService);
+
+  final ingredientEditRepository = IngredientEditRepository(database);
+  final ingredientEditService = IngredientEditService(ingredientEditRepository);
+  final ingredientEditProvider = IngredientEditProvider(ingredientEditService);
 
   runApp(
     MultiProvider(
@@ -50,6 +57,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => formulaListProvider),
         ChangeNotifierProvider(create: (context) => formulaAddProvider),
         ChangeNotifierProvider(create: (context) => ingredientListProvider),
+        ChangeNotifierProvider(create: (context) => ingredientEditProvider),
         // ChangeNotifierProvider(create: (context) => settingsProvider)
       ],
       child: MainApp(),
