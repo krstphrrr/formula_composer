@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:formula_composer/features/formula_list/presentation/formula_list_page.dart';
 import 'package:formula_composer/features/ingredient_list/presentation/ingredient_list_page.dart';
 import 'package:provider/provider.dart';
+import '../../features/settings_data/presentation/settings_data_page.dart';
 import '../providers/theme_provider.dart';
 
 class MainNavBar extends StatefulWidget {
@@ -60,19 +61,19 @@ class _MainNavBarState extends State<MainNavBar> {
                 themeProvider.toggleTheme();
               },
             ),
-            // ListTile(
-            //   leading: const Icon(Icons.settings),
-            //   title: const Text('Settings'),
-            //   onTap: () {
-            //     Navigator.push(
-            //               context,
-            //               MaterialPageRoute(
-            //                 builder: (context) =>
-            //                     SettingsPage(),
-            //               ),
-            //             );
-            //   },
-            // ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SettingsDataPage(),
+                          ),
+                        );
+              },
+            ),
           ],
         ),
       ),
