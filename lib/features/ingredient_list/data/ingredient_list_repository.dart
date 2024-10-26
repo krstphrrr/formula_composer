@@ -51,4 +51,24 @@ class IngredientListRepository {
       return [];
     }
   }
+    Future<void> deleteIngredient(int id) async {
+    final db = await DatabaseHelper().database;
+    if (kDebugMode) {
+      print("ingredient_repository: Deleting ingredient with id: $id");
+    }
+    try {
+      await db.delete('ingredients', where: 'id = ?', whereArgs: [id]);
+      if (kDebugMode) {
+        print("Ingredient deleted successfully.");
+      }
+
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error deleting ingredient: $e");
+      }
+    }
+  }
+  
+
+
 }
