@@ -68,6 +68,51 @@ class IngredientListRepository {
       }
     }
   }
+
+    Future<void> insertIngredientIntoDatabase(Map<String, dynamic> ingredient) async {
+    final db = await DatabaseHelper().database;
+
+    // Update or add the CAS numbers
+    if (ingredient['cas_number'] != null) {
+      await addCASNumber(ingredient['id'], ingredient['cas_number'] );
+      ingredient.remove('cas_number');
+  }
+  
+    try{
+      await db.insert('ingredients', ingredient);
+      if (kDebugMode) {
+        print("inserted ingredients: $ingredient");
+      }
+
+      
+    } catch(e){
+      if (kDebugMode) {
+        print("Failed to insert ingredient: $e");
+    
+      }}
+    // Insert ingredient into the database
+    
+  }
+
+    Future<void> addCASNumber(int ingredientId, String cas) async {
+    final db = await DatabaseHelper().database;
+    // if (kDebugMode) {
+    print("Adding CAS number $cas for ingredient $ingredientId");
+    // }
+    try {
+      await db.insert('cas_numbers', {
+        'ingredient_id': ingredientId,
+        'cas_number': cas,
+      });
+      // if (kDebugMode) {
+      print("CAS number added successfully.");
+      // }
+    } catch (e) {
+      // if (kDebugMode) {
+      print("Error adding CAS number: $e");
+      // }
+    }
+  }
   
 
 

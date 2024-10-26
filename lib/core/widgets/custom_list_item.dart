@@ -7,6 +7,7 @@ class CustomListItem extends StatelessWidget {
   final void Function(BuildContext)? onEditPressed;
   final void Function(BuildContext)? onDeletePressed;
   final VoidCallback? onTap; 
+  final ImageProvider? centerImage; // Image for the center column
 
   const CustomListItem({
     super.key,
@@ -14,30 +15,73 @@ class CustomListItem extends StatelessWidget {
     required this.subtitle,
     required this.onEditPressed,
     required this.onDeletePressed,
-    this.onTap
+    this.onTap,
+    this.centerImage, // Accept image as an argument
   });
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Slidable(
       endActionPane: ActionPane(
-        motion: const StretchMotion(), 
+        motion: const StretchMotion(),
         children: [
           SlidableAction(
             onPressed: onEditPressed,
             icon: Icons.edit,
-            ),
-           SlidableAction(
+          ),
+          SlidableAction(
             onPressed: onDeletePressed,
             icon: Icons.delete,
             foregroundColor: Colors.black,
             backgroundColor: Colors.red,
-            )
-        ]),
+          ),
+        ],
+      ),
       child: ListTile(
-        title: Text(title),
-        subtitle: Text(subtitle),
         onTap: onTap,
-      ));
+        title: Row(
+          children: [
+            // Left column for title and subtitle
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            // Center column for the image
+            Expanded(
+              flex: 2,
+              child: centerImage != null
+                  ? Image(
+                      image: centerImage!,
+                      color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                      fit: BoxFit.fitHeight,
+                      height: 34,
+                      width: 34,
+
+                    )
+                  : const SizedBox.shrink(), // Placeholder if no image is provided
+            ),
+            // Right column for additional actions or empty space
+            Expanded(
+              flex: 1,
+              child: Container(), // Can be left empty or used for icons
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -108,7 +108,7 @@ class _FormulaListPageState extends State<FormulaListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Formula List'),
-        centerTitle: true, 
+        // centerTitle: true, 
       ),
       body: Consumer<FormulaListProvider>(
         builder: (context, formulaListProvider, child) {

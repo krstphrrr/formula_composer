@@ -25,7 +25,7 @@ class DatabaseHelper {
     print("Database path: $dbPath");
 
     bool resetDatabase =
-        true; // Set this to true if you want to delete the database
+        false; // Set this to true if you want to delete the database
 
     if (resetDatabase) {
       await deleteDatabase(dbPath); // This will delete the existing database

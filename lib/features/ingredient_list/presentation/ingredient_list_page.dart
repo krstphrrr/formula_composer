@@ -14,6 +14,22 @@ class IngredientListPage extends StatefulWidget {
 }
 
 class _IngredientListPageState extends State<IngredientListPage> {
+
+  @override
+  void initState() {
+    super.initState();
+    // _controller = AnimationController(
+    //   duration: const Duration(seconds: 2),
+    //   vsync: this,
+    // );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ingredientProvider =
+          Provider.of<IngredientListProvider>(context, listen: false);
+      ingredientProvider.fetchIngredients(); // Fetch ingredients when the page loads
+    });
+  }
+
   Future<void> openDeleteBox(int index) async {
     final ingredientListProvider =
         Provider.of<IngredientListProvider>(context, listen: false);
@@ -86,6 +102,61 @@ class _IngredientListPageState extends State<IngredientListPage> {
     });
   }
 
+  void _showSortDialog() {
+    final ingredientProvider =
+        Provider.of<IngredientListProvider>(context, listen: false);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sort by'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: const Text('Name'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ingredientProvider.sortIngredients('name');
+                },
+              ),
+              ListTile(
+                title: const Text('Acquisition Date'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ingredientProvider.sortIngredients('acquisition_date');
+                },
+              ),
+              ListTile(
+                title: const Text('Cost'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ingredientProvider.sortIngredients('cost');
+                },
+              ),
+              ListTile(
+                title: const Text('Substantivity'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ingredientProvider.sortIngredients('substantivity');
+                },
+              ),
+              ListTile(
+                title: Text('Sort by Pyramid Placement'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  ingredientProvider
+                      .sortIngredients('pyramid'); // Normal sort order
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ingredientListProvider =
@@ -94,7 +165,22 @@ class _IngredientListPageState extends State<IngredientListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ingredient Inventory'),
-        centerTitle: true,
+        actions: [
+            // Export Button
+            IconButton(
+              icon: const Icon(Icons.file_upload),
+              onPressed: () {
+                ingredientListProvider.exportData(context);
+              }, // Call export function
+            ),
+            // Import Button
+            IconButton(
+              icon: const Icon(Icons.file_download),
+              onPressed: () {
+                ingredientListProvider.importData(context);
+              }, // Call import function,
+            ),
+        ],
       ),
       body: Consumer<IngredientListProvider>(
         builder: (context, ingredientListProvider, child) {
@@ -133,18 +219,59 @@ class _IngredientListPageState extends State<IngredientListPage> {
                     },
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: _showSortDialog,
+                      child: const Text('Sort'),
+                    ),
+                    // Display the total number of ingredients
+                    Text(
+                      'Total: ${ingredientListProvider.totalIngredients}',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    ElevatedButton(
+                      onPressed: ingredientListProvider.reverseSort,
+                      child: const Text('Reverse Sort'),
+                    ),
+                  ],
+                ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: ingredients.length,
                     itemBuilder: (context, index) {
                       final ingredient = ingredients[index];
-                      String sub = '';
+                      String assetPath =
+                          'assets/images/4x/none_xxxhdpi.png'; // Default asset
+                      switch (ingredient['pyramid_place']) {
+                        case 'top':
+                          assetPath = 'assets/images/4x/top_xxxhdpi.png';
+                          break;
+                        case 'top-mid':
+                          assetPath = 'assets/images/4x/top_mid_xxxhdpi.png';
+                          break;
+                        case 'mid':
+                          assetPath = 'assets/images/4x/mid_xxxhdpi.png';
+                          break;
+                        case 'mid-base':
+                          assetPath = 'assets/images/4x/mid-base_xxxhdpi.png';
+                          break;
+                        case 'base':
+                          assetPath = 'assets/images/4x/base_xxxhdpi.png';
+                          break;
+                        default:
+                          assetPath = 'assets/images/4x/none_xxxhdpi.png';
+                          break;
+                      }
+                      String sub = 'Cost: \$${ingredient['cost_per_gram']}, Substantivity: ${ingredient['substantivity']}';
 
                       return CustomListItem(
                         title: ingredient['name'],
                         subtitle: sub,
                         onEditPressed: (context) => openEditBox(index),
                         onDeletePressed: (context) => openDeleteBox(index),
+                        centerImage: AssetImage(assetPath),
                         onTap: () {
                           print("TAPPED");
                           // Navigator.push(
