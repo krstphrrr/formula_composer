@@ -25,7 +25,7 @@ class DatabaseHelper {
     print("Database path: $dbPath");
 
     bool resetDatabase =
-        false; // Set this to true if you want to delete the database
+        true; // Set this to true if you want to delete the database
 
     if (resetDatabase) {
       await deleteDatabase(dbPath); // This will delete the existing database
@@ -35,7 +35,7 @@ class DatabaseHelper {
       print("Initializing database...");
       final db = await openDatabase(
         'formula_manager.db',
-        version: 2,
+        version: 5,
         readOnly: false,
         onCreate: (db, version) async {
           print("Creating tables...");
@@ -204,10 +204,43 @@ class DatabaseHelper {
           await db.execute('''
                               INSERT INTO ifra_categories (category_id, description) VALUES ('category_12', 'Candles/Incense/Air Fresheners');
                             ''');
+
+           await db.execute('''
+                CREATE TABLE olfactive_categories (
+                  id INTEGER PRIMARY KEY,
+                  name TEXT NOT NULL,
+                  color TEXT
+                );
+              ''');
+          final categories = [
+            'Aldehydic',
+            'Ambery',
+            'Citrus',
+            'Floral',
+            'Fruity',
+            'Gourmand',
+            'Green',
+            'Herbal',
+            'Agrestic',
+            'Leather',
+            'Moss',
+            'Marine',
+            'Musky',
+            'Spicy',
+            'Terpenic',
+            'Woody',
+          ];
+
+          // Insert each category with color as NULL
+          for (var category in categories) {
+            await db.insert('olfactive_categories', {'name': category, 'color': null});
+          }
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           //   print("Upgrading database from version $oldVersion to $newVersion");
-
+          print("upgrading...");
+          print(oldVersion);
+          print(newVersion);
           if (oldVersion < 1) {
             //     // If the database version is less than 5, add the `amount` column to the `ingredients` table
 
@@ -284,9 +317,44 @@ class DatabaseHelper {
                 ALTER TABLE formulas ADD COLUMN modified_date TEXT
               ''');
           }
+          if (oldVersion < 5) {
+            print("...to version 5");
+            await db.execute('''DROP TABLE olfactive_categories;''');
+            await db.execute('''
+                CREATE TABLE olfactive_categories (
+                  id INTEGER PRIMARY KEY,
+                  name TEXT NOT NULL,
+                  color TEXT
+                );
+              ''');
+          final categories = [
+            'Aldehydic',
+            'Ambery',
+            'Citrus',
+            'Floral',
+            'Fruity',
+            'Gourmand',
+            'Green',
+            'Herbal',
+            'Agrestic',
+            'Leather',
+            'Moss',
+            'Marine',
+            'Musky',
+            'Spicy',
+            'Terpenic',
+            'Woody',
+          ];
+
+          // Insert each category with color as NULL
+          for (var category in categories) {
+            await db.insert('olfactive_categories', {'name': category, 'color': null});
+          }
+
+          }
         },
       );
-      print(await db.rawQuery('PRAGMA table_info(formulas)'));
+      // print(await db.rawQuery('select * from olfactive_categories'));
       return db;
     } catch (e) {
       print("Error initializing database: $e");

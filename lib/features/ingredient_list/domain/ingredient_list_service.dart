@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -156,5 +157,16 @@ class IngredientListService {
       // Insert into the database
       await _repository.insertIngredientIntoDatabase(ingredient);
     }
+  }
+
+    Future<Color> getCategoryColor(String categoryName) async {
+    // Fetch the hex color code from the repository
+    final colorHex = await _repository.getCategoryColor(categoryName);
+    print("cat: ${categoryName} color: ${colorHex}");
+
+    // If color is null (not set), provide a default color, else parse the color
+    return colorHex != null
+        ? Color(int.parse(colorHex.replaceFirst('#', '0xFF'))) // Convert hex to Color
+        : Colors.grey; // Default color if none set
   }
 }

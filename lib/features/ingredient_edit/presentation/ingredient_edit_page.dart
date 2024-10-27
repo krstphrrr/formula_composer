@@ -19,10 +19,12 @@ class _IngredientEditPageState extends State<IngredientEditPage> {
   @override
   void initState() {
     super.initState();
+    
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ingredientEditProvider =
           Provider.of<IngredientEditProvider>(context, listen: false);
+      ingredientEditProvider.fetchCategories();
       if (widget.ingredientId != null) {
         ingredientEditProvider.selectedIngredient = widget.ingredientId;
         ingredientEditProvider.loadIngredientDetails();
@@ -211,30 +213,34 @@ class _IngredientEditPageState extends State<IngredientEditPage> {
     );
   }
 
-  Widget _buildDropdownCategory(BuildContext context, List<String> values) {
-    final ingredientEditProvider = Provider.of<IngredientEditProvider>(context);
+  Widget _buildDropdownCategory(BuildContext context) {
+  final ingredientEditProvider = Provider.of<IngredientEditProvider>(context);
 
-    String? currentCategory = ingredientEditProvider.categoryController.text;
 
-    return DropdownButtonFormField<String>(
-      value: values.contains(currentCategory)
-          ? currentCategory
-          : null, // Ensure valid value
-      decoration: const InputDecoration(labelText: 'Category'),
-      items: values.map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: (newValue) {
-        if (newValue != null) {
-          print('Selected category: $newValue');
-          ingredientEditProvider.updateCategory(newValue);
-        }
-      },
-    );
-  }
+  String? currentCategory = ingredientEditProvider.categoryController.text;
+
+  return Consumer<IngredientListProvider>(
+    builder: (context, provider, child) {
+      return DropdownButtonFormField<String>(
+        value: ingredientEditProvider.categories.contains(currentCategory)
+            ? currentCategory
+            : null,
+        decoration: const InputDecoration(labelText: 'Category'),
+        items: ingredientEditProvider.categories.map((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (newValue) {
+          if (newValue != null) {
+            ingredientEditProvider.updateCategory(newValue);
+          }
+        },
+      );
+    },
+  );
+}
 
   Widget _buildDropdownPyramidPlace(
       BuildContext context, String label, List<String> values) {
@@ -311,7 +317,7 @@ class _IngredientEditPageState extends State<IngredientEditPage> {
               ),
 
               _buildDropdownCategory(
-                  context, _categoryValues()), // Call modified _buildDropdown
+                  context,), // Call modified _buildDropdown
               TextFormField(
                 decoration: const InputDecoration(
                     labelText: 'Inventory Amount (grams)'),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:formula_composer/features/formula_list/presentation/formula_list_page.dart';
 import 'package:formula_composer/features/ingredient_list/presentation/ingredient_list_page.dart';
+import 'package:formula_composer/features/settings_categories_color/presentation/settings_category_page.dart';
 import 'package:provider/provider.dart';
 import '../../features/settings_data/presentation/settings_data_page.dart';
 import '../providers/theme_provider.dart';
@@ -34,7 +35,19 @@ class _MainNavBarState extends State<MainNavBar> {
     final themeProvider = Provider.of<ThemeProvider>(context); // Access the theme provider
 
     return Scaffold(
-      // appBar: AppBar(),
+  //     appBar: AppBar(
+  //       leading: Builder(
+  //     builder: (context) {
+  //       return IconButton(
+  //         icon: const Icon(Icons.menu),
+  //         onPressed: () {
+  //           Scaffold.of(context).openDrawer();
+  //         },
+  //       );
+  //     },
+  //   ),
+  // // ),
+  //     ),
       drawer: Drawer( // Add a navigation drawer
         child: ListView(
           padding: EdgeInsets.zero,
@@ -70,6 +83,20 @@ class _MainNavBarState extends State<MainNavBar> {
                           MaterialPageRoute(
                             builder: (context) =>
                                 SettingsDataPage(),
+                          ),
+                        );
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.format_color_fill_rounded),
+              title: const Text('Category manager'),
+              onTap: () {
+                Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SettingsCategoryPage(),
                           ),
                         );
               },

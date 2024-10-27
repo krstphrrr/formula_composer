@@ -113,6 +113,19 @@ class IngredientListRepository {
       // }
     }
   }
+
+    Future<String?> getCategoryColor(String categoryName) async {
+    // Query the olfactive_categories table for the color based on the category name
+    final result = await db.query(
+      'olfactive_categories',
+      columns: ['color'],
+      where: 'name = ?',
+      whereArgs: [categoryName],
+    );
+
+    // Return the color if found; otherwise, return null
+    return result.isNotEmpty ? result.first['color'] as String? : null;
+  }
   
 
 

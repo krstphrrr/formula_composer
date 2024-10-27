@@ -29,7 +29,11 @@ class IngredientListProvider extends ChangeNotifier {
 
   String? lastSortOption;
 
+  final Map<String, Color> _categoryColorCache = {};
+
   int get totalIngredients => _ingredients.length;
+
+  Map<String, Color> _categoryColors = {};
 
   @override
   void dispose() {
@@ -49,7 +53,7 @@ class IngredientListProvider extends ChangeNotifier {
   }
 
   // methods
-  void fetchIngredients() async {
+  Future <void> fetchIngredients() async {
     _isLoading = true;
     _hasError = false;
     notifyListeners();
@@ -57,6 +61,14 @@ class IngredientListProvider extends ChangeNotifier {
       // _casController.clear();
       _ingredients = await _service.fetchIngredients();
       _filteredIngredients = _ingredients;
+
+      // Assign colors based on category if available
+    for (var ingredient in _ingredients) {
+      final category = ingredient['category'];
+      if (_categoryColors.containsKey(category)) {
+        ingredient['color'] = _categoryColors[category];
+      }
+    }
     } catch (e) {
       _hasError = true;
       // if (kDebugMode) {
@@ -207,6 +219,32 @@ class IngredientListProvider extends ChangeNotifier {
       isExporting = false;
       notifyListeners();
     }
+  }
+
+  Future<Color> getCategoryColor(String categoryName) async {
+    // Check if color is already in cache
+    // if (_categoryColorCache.containsKey(categoryName)) {
+    //   return _categoryColorCache[categoryName]!;
+    // }
+
+    // Fetch color from service and cache it
+    final color = await _service.getCategoryColor(categoryName);
+    _categoryColorCache[categoryName] = color;
+    return color;
+  }
+
+  // Method to update a specific category's color
+  void updateCategoryColor(String category, Color color) {
+    _categoryColors[category] = color;
+
+    // Update colors in the ingredient list as well
+    for (var ingredient in _ingredients) {
+      if (ingredient['category'] == category) {
+        ingredient['color'] = color;
+      }
+    }
+
+    notifyListeners(); // Notify to refresh UI with new color
   }
 
   // filter ingredients logic

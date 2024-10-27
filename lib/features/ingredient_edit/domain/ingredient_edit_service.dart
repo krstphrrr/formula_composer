@@ -55,4 +55,8 @@ class IngredientEditService {
     print("from service: $id, $casNumber");
     _repository.addCASNumber(id, casNumber);
   }
+
+  Future<List<String>> fetchCategories() async {
+    return await _repository.fetchCategories();
+  }
 }

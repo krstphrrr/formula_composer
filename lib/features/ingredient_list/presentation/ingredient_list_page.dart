@@ -93,7 +93,7 @@ class _IngredientListPageState extends State<IngredientListPage> {
       context,
       MaterialPageRoute(
         builder: (context) => IngredientEditPage(
-          ingredientId: ingredient[index],
+          ingredientId: ingredient['id'],
         ),
       ),
     ).then((_) {
@@ -266,23 +266,25 @@ class _IngredientListPageState extends State<IngredientListPage> {
                       }
                       String sub = 'Cost: \$${ingredient['cost_per_gram']}, Substantivity: ${ingredient['substantivity']}';
 
-                      return CustomListItem(
-                        title: ingredient['name'],
-                        subtitle: sub,
-                        onEditPressed: (context) => openEditBox(index),
-                        onDeletePressed: (context) => openDeleteBox(index),
-                        centerImage: AssetImage(assetPath),
-                        onTap: () {
-                          print("TAPPED");
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) =>
-                          //         IngredientDetailsPage(ingredient: ingredient),
-                          //   ),
-                          // );
-                        },
-                      );
+                      return FutureBuilder<Color>(
+                              future: ingredientListProvider.getCategoryColor(ingredient['category']),
+                              builder: (context, snapshot) {
+                                final categoryColor = snapshot.data ?? Colors.grey; // Default color if loading
+                                return CustomListItem(
+                                  title: ingredient['name'],
+                                  subtitle: 'Cost: \$${ingredient['cost_per_gram']}, Substantivity: ${ingredient['substantivity']}',
+                                  onEditPressed: (context) => openEditBox(index),
+                                  onDeletePressed: (context) => openDeleteBox(index),
+                                  centerImage: AssetImage(assetPath),
+                                  categoryColor: categoryColor,
+                                  onTap: () async{
+                                    print(await ingredientListProvider.getCategoryColor(ingredient['category']));
+                                    print(ingredient);
+                                    
+                                  },
+                                );
+                              },
+                            );
                     },
                   ),
                 ),

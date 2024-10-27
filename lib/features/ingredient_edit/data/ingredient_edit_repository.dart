@@ -168,6 +168,16 @@ class IngredientEditRepository {
       // }
     }
   }
+
+  Future<List<String>> fetchCategories() async {
+    final List<Map<String, dynamic>> result = await db.query(
+      'olfactive_categories',
+      columns: ['name'],
+    );
+
+    // Convert the result into a list of category names
+    return result.map((row) => row['name'] as String).toList();
+  }
 }
 // controllers: dispose and clear
 // add ingredient / update ingredient

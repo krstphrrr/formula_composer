@@ -66,6 +66,9 @@ class IngredientEditProvider extends ChangeNotifier {
   String _category = '';
   String get category => _category;
 
+  List<String> _categories = [];
+  List<String> get categories => _categories;
+
   TextEditingController _categoryController = TextEditingController();
   TextEditingController get categoryController => _categoryController;
 
@@ -379,6 +382,11 @@ void saveIngredient(Map<String, dynamic> ingredientData, List<String> casNumbers
 
     void updateCurrency(String newCurrency) {
     _selectedCurrency = newCurrency;
+    notifyListeners();
+  }
+
+  Future<void> fetchCategories() async {
+    _categories = await _service.fetchCategories();
     notifyListeners();
   }
 
