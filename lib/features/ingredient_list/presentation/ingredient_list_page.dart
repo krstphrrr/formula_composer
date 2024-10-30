@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../ingredient_edit/presentation/ingredient_edit_page.dart';
 import '../../../core/widgets/custom_list_item.dart';
+import '../../ingredient_view/presentation/ingredient_view_page.dart';
 
 class IngredientListPage extends StatefulWidget {
   const IngredientListPage({Key? key}) : super(key: key);
@@ -157,6 +158,15 @@ class _IngredientListPageState extends State<IngredientListPage> {
     );
   }
 
+void openViewPage(int ingredientId) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => IngredientViewPage(
+        ingredientId: ingredientId,
+      ),
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     final ingredientListProvider =
@@ -272,16 +282,12 @@ class _IngredientListPageState extends State<IngredientListPage> {
                                 final categoryColor = snapshot.data ?? Colors.grey; // Default color if loading
                                 return CustomListItem(
                                   title: ingredient['name'],
-                                  subtitle: 'Cost: \$${ingredient['cost_per_gram']}, Substantivity: ${ingredient['substantivity']}',
+                                  subtitle: 'Cost/g: \$${ingredient['cost_per_gram'].toStringAsFixed(2)}, Substantivity: ${ingredient['substantivity']}',
                                   onEditPressed: (context) => openEditBox(index),
                                   onDeletePressed: (context) => openDeleteBox(index),
                                   centerImage: AssetImage(assetPath),
                                   categoryColor: categoryColor,
-                                  onTap: () async{
-                                    print(await ingredientListProvider.getCategoryColor(ingredient['category']));
-                                    print(ingredient);
-                                    
-                                  },
+                                  onTap: () => openViewPage(ingredient['id']),
                                 );
                               },
                             );
@@ -303,6 +309,7 @@ class _IngredientListPageState extends State<IngredientListPage> {
               height: 70,
               width: 230,
               child: FloatingActionButton.extended(
+                heroTag: "ingredient_fab1",
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -325,6 +332,7 @@ class _IngredientListPageState extends State<IngredientListPage> {
           } else {
             // If there are ingredients, show 'plus' button in the bottom right
             return FloatingActionButton(
+              heroTag: "ingredient_fab2",
               onPressed: () {
                 Navigator.push(
                   context,

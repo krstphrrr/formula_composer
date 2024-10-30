@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../core/widgets/custom_list_item.dart';
 import '../../formula_add/presentation/formula_add_page.dart';
 import '../../formula_add/state/formula_add_provider.dart';
+import '../../formula_ingredients/presentation/formula_ingredient_page.dart';
 import '../state/formula_list_provider.dart';
 
 
@@ -166,13 +167,13 @@ class _FormulaListPageState extends State<FormulaListPage> {
                         onDeletePressed: (context) => openDeleteBox(index),
                         onTap: () {
                           print("TAPPED");
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) =>
-                          //         FormulaDetailsPage(formula: formula),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  FormulaIngredientPage(formulaId: formula['id']),
+                            ),
+                          );
                         },
                       );
                     },
@@ -193,6 +194,7 @@ class _FormulaListPageState extends State<FormulaListPage> {
             height: 70,
             width: 180,
             child: FloatingActionButton.extended(
+              heroTag: "formula_fab1",
               onPressed: () {
                 Navigator.push(
                   context,
@@ -211,6 +213,7 @@ class _FormulaListPageState extends State<FormulaListPage> {
         } else {
           // If there are formulas, show 'plus' button in the bottom right
           return FloatingActionButton(
+            heroTag: "formula_fab2",
             onPressed: () {
               Navigator.push(
                 context,
