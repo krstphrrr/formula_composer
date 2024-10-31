@@ -35,10 +35,11 @@ class DatabaseHelper {
       print("Initializing database...");
       final db = await openDatabase(
         'formula_manager.db',
-        version: 5,
+        version: 7,
         readOnly: false,
         onCreate: (db, version) async {
           print("Creating tables...");
+          await db.execute('PRAGMA foreign_keys = ON'); 
           await db.execute('''
           CREATE TABLE IF NOT EXISTS formulas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +57,7 @@ class DatabaseHelper {
               ingredient_id INTEGER,
               amount REAL,
               dilution REAL,
-              FOREIGN KEY (formula_id) REFERENCES formulas(id),
+              FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE,
               FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
             )
           ''');
@@ -351,6 +352,22 @@ class DatabaseHelper {
             await db.insert('olfactive_categories', {'name': category, 'color': null});
           }
 
+          }
+          if(oldVersion <6 ){
+            // remove old formula ingredients
+           db.execute('ALTER TABLE formula_ingredients RENAME TO old_formula_ingredients;');
+          //  remake with on cascade
+           db.execute('''
+              CREATE TABLE formula_ingredients (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                formula_id INTEGER,
+                ingredient_id INTEGER,
+                amount REAL,
+                dilution REAL,
+                FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE,
+                FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
+              ); ''');
+            db.execute('DROP TABLE old_formula_ingredients;');
           }
         },
       );

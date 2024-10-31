@@ -7,8 +7,8 @@ class FormulaIngredientListItem extends StatelessWidget {
   final TextEditingController dilutionController;
   final String relativeAmountText;
   final VoidCallback onDeletePressed;
-  final FocusNode amountFocusNode;
-  final FocusNode dilutionFocusNode;
+  final FocusNode? amountFocusNode;
+  final FocusNode? dilutionFocusNode;
 
   const FormulaIngredientListItem({
     super.key,
@@ -17,8 +17,8 @@ class FormulaIngredientListItem extends StatelessWidget {
     required this.dilutionController,
     required this.relativeAmountText,
     required this.onDeletePressed,
-    required this.amountFocusNode,
-    required this.dilutionFocusNode,
+   this.amountFocusNode,
+   this.dilutionFocusNode,
   });
 
   @override

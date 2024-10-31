@@ -171,7 +171,7 @@ class _FormulaListPageState extends State<FormulaListPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  FormulaIngredientPage(formulaId: formula['id']),
+                                  FormulaIngredientPage(formula: formula),
                             ),
                           );
                         },

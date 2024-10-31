@@ -2,25 +2,63 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/formula_ing_list_item.dart';
 import '../state/formula_ingredient_provider.dart';
-// import 'formula_ingredient_provider.dart';
-// import 'formula_ingredient_list_item.dart'; // Assuming this is the new widget
 
 class FormulaIngredientPage extends StatefulWidget {
-  final int formulaId;
+  // final int formulaId;
+  final Map<String, dynamic> formula;
 
-  const FormulaIngredientPage({Key? key, required this.formulaId}) : super(key: key);
+  const FormulaIngredientPage({
+    Key? key, 
+    // required this.formulaId,
+    required this.formula
+    }) : super(key: key);
 
   @override
   _FormulaIngredientPageState createState() => _FormulaIngredientPageState();
 }
 
 class _FormulaIngredientPageState extends State<FormulaIngredientPage> {
+  // ui properties
+  // List<FocusNode> amountFocusNodes = [];
+  // List<FocusNode> dilutionFocusNodes = [];
+
+
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final formulaIngredientProvider = Provider.of<FormulaIngredientProvider>(context, listen: false);
-      formulaIngredientProvider.initializeIngredients(widget.formulaId); // Load ingredients for this formula
+      formulaIngredientProvider.currentFormulaId = widget.formula['id'];
+      formulaIngredientProvider.formulaDisplayName = widget.formula['name'];
+
+      // formulaIngredientProvider.initializeIngredients(widget.formulaId); // Load ingredients for this formula
+      formulaIngredientProvider.fetchFormulaIngredients(widget.formula['id']);
+      formulaIngredientProvider.fetchAvailableIngredients();
+      formulaIngredientProvider.calculateTotalAmount();
+      // formulaIngredientProvider.initializeIngredients();
+      // formulaIngredientProvider.filterAvailableIngredients(query)
+
+    //   for (int i = 0;
+    //       i < formulaIngredientProvider.formulaIngredients.length;
+    //       i++) {
+    //     dilutionFocusNodes.add(FocusNode());
+    //     dilutionFocusNodes[i].addListener(() {
+    //       if (!dilutionFocusNodes[i].hasFocus) {
+    //         // Trigger update when the field loses focus
+    //         double dilution = double.tryParse(
+    //                 formulaIngredientProvider.dilutionControllers[i].text) ??
+    //             1.0;
+    //         formulaIngredientProvider.updateIngredientInFormula(
+    //           context,
+    //             i,
+    //             formulaIngredientProvider.formulaIngredients[i]
+    //                 ['ingredient_id'],
+    //             formulaIngredientProvider.formulaIngredients[i]['amount'],
+    //             dilution);
+    //       }
+    //     });
+    //   }
     });
   }
 
@@ -67,7 +105,8 @@ void _showAddIngredientModal(BuildContext context) {
                       trailing: IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          formulaIngredientProvider.addIngredientToFormula(ingredient['id']);
+                          // formulaIngredientProvider.addIngredientToFormula(index, ingredient['id']);
+                          formulaIngredientProvider.addIngredientRow(context, index);
                           Navigator.pop(context); // Close the bottom sheet once an ingredient is added
                         },
                       ),
@@ -97,12 +136,17 @@ Widget build(BuildContext context) {
     return ListView.builder(
             itemCount: formulaIngredientProvider.formulaIngredients.length,
             itemBuilder: (context, index) {
-              final ingredient = formulaIngredientProvider.formulaIngredients[index];
-              final amountController = formulaIngredientProvider.amountControllers[index];
-              final dilutionController = formulaIngredientProvider.dilutionControllers[index];
+              //  access controllers safely
+            //     if (index < formulaIngredientProvider.amountControllers.length &&
+            //  index < formulaIngredientProvider.dilutionControllers.length) {
+           final ingredient = formulaIngredientProvider.formulaIngredients[index];
+           final amountController = formulaIngredientProvider.amountControllers[index];
+           final dilutionController = formulaIngredientProvider.dilutionControllers[index];
+          //  final ingredient['name'] = formulaIngredientProvider.
+           
 
-              final amountFocusNode = formulaIngredientProvider.amountFocusNodes[index];
-              final dilutionFocusNode = formulaIngredientProvider.dilutionFocusNodes[index];
+              // final amountFocusNode = formulaIngredientProvider.amountFocusNodes[index];
+              // final dilutionFocusNode = formulaIngredientProvider.dilutionFocusNodes[index];
 
               double dilution = double.tryParse(dilutionController.text) ?? 1.0;
                double relativeAmount =
@@ -117,14 +161,14 @@ Widget build(BuildContext context) {
                     amountController: amountController,
                     dilutionController: dilutionController,
                     relativeAmountText: (relativeAmount * 100).toStringAsFixed(2),
-                    amountFocusNode: amountFocusNode,
-                    dilutionFocusNode: dilutionFocusNode,
+                    // amountFocusNode: amountFocusNode,
+                    // dilutionFocusNode: dilutionFocusNode,
                     onDeletePressed: () {
                       formulaIngredientProvider.removeIngredient(index);
                     },
                   );
-                      },
-                    );
+                      }
+  );
             },
           )
         ),
@@ -139,7 +183,7 @@ Widget build(BuildContext context) {
                     final formulaIngredientProvider =
                         Provider.of<FormulaIngredientProvider>(context,
                             listen: false);
-                    await formulaIngredientProvider.saveAllChanges(widget.formulaId);
+                    // await formulaIngredientProvider.saveAllChanges(formulaIngredientProvider.currentFormulaId!);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('All changes saved successfully')),
                     );
@@ -148,9 +192,15 @@ Widget build(BuildContext context) {
                   mini: true,
                 ),
                 FloatingActionButton.extended(
+                  
                   heroTag: "addFab",
                   onPressed: () {
+
+                     final formulaIngredientProvider =
+                        Provider.of<FormulaIngredientProvider>(context,
+                            listen: false);
                     _showAddIngredientModal(context);
+                    // formulaIngredientProvider.addIngredientRow(context);
                   },
                   icon: const Icon(Icons.add),
                   label: const Text('Add Ingredient'),

@@ -17,11 +17,13 @@ class FormulaIngredientService {
   }
 
   Future<void> updateIngredientInFormula(int ingredientId, double amount, double dilution) async {
+    print("UPDATING IN SERVIUCE...");
     await _repository.updateIngredient(ingredientId, amount, dilution);
   }
 
-  Future<void> removeIngredientFromFormula(int ingredientId) async {
-    await _repository.removeIngredientFromFormula(ingredientId);
+  Future<void>  deleteFormulaIngredient(int formulaId, int ingredientId) async {
+    print("REMOVING FROM SERVICE");
+    await _repository.deleteFormulaIngredient(formulaId, ingredientId);
   }
 
   Future<void> saveFormulaIngredients(Map<String, dynamic> ingredients) async {
@@ -37,6 +39,19 @@ class FormulaIngredientService {
 
   Future<void> saveAllIngredients(int formulaId, List<Map<String, dynamic>> ingredients) async {
     await _repository.updateAllIngredients(formulaId, ingredients);
+  }
+
+    Future<List<Map<String, dynamic>>> fetchAvailableIngredients() async {
+    return await _repository.fetchAvailableIngredients();
+  }
+
+  
+  double calculateTotalAmount(List<Map<String, dynamic>> formulaIngredients) {
+    double total = 0.0;
+    for (var ingredient in formulaIngredients) {
+      total += ingredient['amount'] * (ingredient['dilution'] ?? 1.0);
+    }
+    return total;
   }
 
 }

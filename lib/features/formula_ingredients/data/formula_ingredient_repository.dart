@@ -8,14 +8,20 @@ class FormulaIngredientRepository {
   FormulaIngredientRepository(this.db);
 
   Future<List<Map<String, dynamic>>> fetchAvailableIngredients() async {
-    final db = await DatabaseHelper().database;
+  final db = await DatabaseHelper().database;
+    print("Fetching ingredients from the database...");
     try {
-      return await db.query('ingredients');
+      final data = await db.query('ingredients');
+      print("Fetched ingredients: $data");
+      // _ingredients = data;
+      // notifyListeners();
+      return data; // Return the fetched ingredients
     } catch (e) {
-      print("Error fetching available ingredients: $e");
-      return [];
+      print("Error fetching ingredients: $e");
+      return []; // Return an empty list if there's an error
     }
   }
+
 
   Future<List<Map<String, dynamic>>> fetchIngredientsForFormula(int formulaId) async {
     final db = await DatabaseHelper().database;
@@ -64,16 +70,21 @@ class FormulaIngredientRepository {
     }
   }
 
-  Future<void> removeIngredientFromFormula(int ingredientId) async {
-    final db = await DatabaseHelper().database;
+  Future<void> deleteFormulaIngredient(int formulaId, int ingredientId) async {
+     final db = await DatabaseHelper().database;
     try {
       await db.delete(
         'formula_ingredients',
-        where: 'id = ?',
-        whereArgs: [ingredientId],
+        where: 'formula_id = ? AND ingredient_id = ?',
+        whereArgs: [formulaId, ingredientId],
       );
+      // if (kDebugMode) {
+        print("Formula ingredient deleted successfully.");
+      // }
     } catch (e) {
-      print("Error removing ingredient from formula: $e");
+      // if (kDebugMode) {
+        print("Error deleting formula ingredient: $e");
+      // }
     }
   }
 
@@ -118,6 +129,7 @@ class FormulaIngredientRepository {
         INNER JOIN ingredients i ON fi.ingredient_id = i.id
         WHERE fi.formula_id = ?
       ''', [formulaId]);
+      // final data = await db.rawQuery("SELECT * FROM formula_ingredients");
       print("Fetched formula ingredients: $data");
       return data;
     } catch (e) {
@@ -161,7 +173,7 @@ class FormulaIngredientRepository {
 
     // Use a batch to perform all updates in a single transaction
     Batch batch = db.batch();
-     print("updating all.");
+     print("updating all. ${ingredients} and id: ${formulaId}");
 
     for (var ingredient in ingredients) {
       batch.update(
