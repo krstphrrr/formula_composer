@@ -4,23 +4,7 @@ import 'package:formula_composer/features/formula_ingredients/domain/formula_ing
 class FormulaIngredientProvider extends ChangeNotifier {
   final FormulaIngredientService _service;
   FormulaIngredientProvider(this._service){
-    // Initialize FocusNodes
-    for (int i = 0; i < amountControllers.length; i++) {
-      _amountFocusNodes.add(FocusNode());
-      _dilutionFocusNodes.add(FocusNode());
-      _amountFocusNodes[i].addListener(() {
-        if (!_amountFocusNodes[i].hasFocus) {
-          // _saveIngredientChanges(i);
-          print("CHANGED AMOUNT");
-        }
-      });
-      _dilutionFocusNodes[i].addListener(() {
-        if (!_dilutionFocusNodes[i].hasFocus) {
-          // _saveIngredientChanges(i);
-          print("CHANGE DILUTION");
-          }
-      });
-    }
+  
   }
 
   Map<String, dynamic>? _currentFormula;
@@ -79,6 +63,14 @@ class FormulaIngredientProvider extends ChangeNotifier {
     for (var focusNode in _dilutionFocusNodes) {
       focusNode.dispose();
     }
+
+    // Dispose of controllers
+    for (var controller in _amountControllers) {
+      controller.dispose();
+    }
+    for (var controller in _dilutionControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -86,6 +78,61 @@ class FormulaIngredientProvider extends ChangeNotifier {
     _searchController.clear();
      notifyListeners();
   }
+
+void _initializeFocusNodes(int index) {
+  FocusNode amountFocusNode = FocusNode();
+  FocusNode dilutionFocusNode = FocusNode();
+
+  amountFocusNode.addListener(() {
+    if (!amountFocusNode.hasFocus) {
+      double amount = double.tryParse(_amountControllers[index].text) ?? 0.0;
+      updateIngredientInFormula(
+        index,
+        _formulaIngredients[index]['ingredient_id'],
+        amount,
+        _formulaIngredients[index]['dilution'],
+      );
+      print("CHANGED AMOUNT");
+    }
+  });
+
+  dilutionFocusNode.addListener(() {
+    if (!dilutionFocusNode.hasFocus) {
+      double dilution = double.tryParse(_dilutionControllers[index].text) ?? 1.0;
+      updateIngredientInFormula(
+        index,
+        _formulaIngredients[index]['ingredient_id'],
+        _formulaIngredients[index]['amount'],
+        dilution,
+      );
+      print("CHANGE DILUTION");
+    }
+  });
+
+  _amountFocusNodes.add(amountFocusNode);
+  _dilutionFocusNodes.add(dilutionFocusNode);
+}
+
+Future<void> fetchFormulaIngredients(int formulaId) async {
+  var ingredients = await _service.fetchFormulaIngredients(formulaId);
+  _formulaIngredients = ingredients.map((ingredient) => Map<String, dynamic>.from(ingredient)).toList();
+  
+  print("FORMULA ING ON PROVIDER: ${_formulaIngredients}");
+  print("pretotal: ${_totalAmount}");
+  
+  _totalAmount = _service.calculateTotalAmount(_formulaIngredients);
+  print("posttotal: ${_totalAmount}");
+  
+  _amountControllers = _formulaIngredients.map((ingredient) {
+    return TextEditingController(text: ingredient['amount'].toString());
+  }).toList();
+  
+  _dilutionControllers = _formulaIngredients.map((ingredient) {
+    return TextEditingController(text: ingredient['dilution'].toString());
+  }).toList();
+
+  notifyListeners();
+}
 
 
 // void initializeIngredients() async {
@@ -157,6 +204,7 @@ class FormulaIngredientProvider extends ChangeNotifier {
 Future<void> addIngredientToFormula(int rowIndex, int ingredientId) async {
   // add ingredient
 
+
   _formulaIngredients[rowIndex]['ingredient_id'] = ingredientId;
 
   _service.addFormulaIngredient(
@@ -207,6 +255,7 @@ Future<void> addIngredientToFormula(int rowIndex, int ingredientId) async {
 
     // _amountFocusNodes.add(amountFocusNode);
     // _dilutionFocusNodes.add(dilutionFocusNode);
+    // _initializeFocusNodes(rowIndex);
 
     notifyListeners();
     // await checkIfraCompliance(context);
@@ -236,7 +285,7 @@ Future<void> addIngredientToFormula(int rowIndex, int ingredientId) async {
 
 // AKI
     // Ensure focus nodes are reinitialized to match the new ingredient count
-    // initializeFocusNodes(_formulaIngredients.length);
+    _initializeFocusNodes(index);
     // fetchFormulaIngredients(_currentFormulaId!);
     // fetchAvailableIngredients();
 
@@ -249,16 +298,17 @@ Future<void> addIngredientToFormula(int rowIndex, int ingredientId) async {
     print("PRE REM: ${_formulaIngredients}");
     // int ingredientId = _formulaIngredients[index]['id'];
     // await _service.removeIngredientFromFormula(ingredientId);
-    _service.deleteFormulaIngredient(
+    await _service.deleteFormulaIngredient(
         _currentFormulaId!, _formulaIngredients[index]['ingredient_id']);
     
     _formulaIngredients.removeAt(index);
     _amountControllers.removeAt(index);
     _dilutionControllers.removeAt(index);
-    // _amountFocusNodes.removeAt(index).dispose();  // Dispose of the FocusNode properly
-    // _dilutionFocusNodes.removeAt(index).dispose();  // Dispose of the FocusNode properly
-    //  print("POST REM: ${_formulaIngredients}");
+    _amountFocusNodes.removeAt(index).dispose();  // Dispose of the FocusNode properly
+    _dilutionFocusNodes.removeAt(index).dispose();  // Dispose of the FocusNode properly
+     print("POST REM: ${_formulaIngredients}");
     //  final ingredient = _formulaIngredients[index];
+
      
     
     // notifyListeners();
@@ -272,15 +322,21 @@ Future<void> addIngredientToFormula(int rowIndex, int ingredientId) async {
     await fetchFormulaIngredients(formulaId); // Refresh the list after deleting
   }
 
-  // void updateIngredientInFormula(int index, double amount, double dilution) async {
-  //   _formulaIngredients[index]['amount'] = amount;
-  //   _formulaIngredients[index]['dilution'] = dilution;
+  void updateIngredientInFormula(
+    int index, 
+    int ingredientId, 
+    double amount, 
+    double dilution) async {
+      print("updating from provider: ${amount}");
+    _formulaIngredients[index]['amount'] = amount;
+    _formulaIngredients[index]['dilution'] = dilution;
 
-  //   await _service.updateIngredientInFormula(_formulaIngredients[index]);
+    await _service.updateIngredientInFormula(_currentFormulaId!, ingredientId, amount, dilution);
 
-  //   calculateTotalAmount();
-  //   notifyListeners();
-  // }
+    _totalAmount =
+        _service.calculateTotalAmount(formulaIngredients);
+    notifyListeners();
+  }
 
  void calculateTotalAmount() {
     _totalAmount = _formulaIngredients.asMap().entries.fold(0.0, (sum, entry) {
@@ -301,20 +357,6 @@ Future<void> addIngredientToFormula(int rowIndex, int ingredientId) async {
   //   fetchFormulaIngredients(formulaId); // Refresh the list after adding
   // }
 
-Future<void> fetchFormulaIngredients(int formulaId) async{
-   _formulaIngredients = List.from( await _service.fetchFormulaIngredients(formulaId));
-   print("FORMULA ING ON PROVIDER: ${_formulaIngredients}");
-
-       _service.calculateTotalAmount(_formulaIngredients);
-    // _amountControllers = _formulaIngredients.map((ingredient) {
-    //     return TextEditingController(text: ingredient['amount'].toString());
-    // }).toList();
-    // _dilutionControllers = _formulaIngredients.map((ingredient) {
-    //     return TextEditingController(text: ingredient['dilution'].toString());
-    // }).toList();
-
-    notifyListeners();
-}
 
 
 //   void saveIngredients(BuildContext context) async {
@@ -352,5 +394,14 @@ Future<void> fetchFormulaIngredients(int formulaId) async{
 
 //     await _service.saveAllIngredients(formulaId, updatedIngredients);
 //   }
+
+
+void updateDilutionFactor(int index, String value) {
+    final dilution = double.tryParse(value) ?? 1.0;
+    _formulaIngredients[index]['dilution'] = dilution;
+    calculateTotalAmount(); // Recalculate total when dilution changes
+    notifyListeners();
+  }
+
 }
 // Previously, I added a new list item and searched for an ingredient inside the dropdown within the added list item. Now that the search bar determines what gets added

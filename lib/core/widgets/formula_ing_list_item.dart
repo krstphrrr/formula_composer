@@ -7,6 +7,8 @@ class FormulaIngredientListItem extends StatelessWidget {
   final TextEditingController dilutionController;
   final String relativeAmountText;
   final VoidCallback onDeletePressed;
+  final void Function(dynamic) onChangedAmount;
+  final void Function(dynamic) onChangedDilution;
   final FocusNode? amountFocusNode;
   final FocusNode? dilutionFocusNode;
 
@@ -17,6 +19,8 @@ class FormulaIngredientListItem extends StatelessWidget {
     required this.dilutionController,
     required this.relativeAmountText,
     required this.onDeletePressed,
+    required this.onChangedAmount,
+    required this.onChangedDilution,
    this.amountFocusNode,
    this.dilutionFocusNode,
   });
@@ -44,16 +48,27 @@ class FormulaIngredientListItem extends StatelessWidget {
         ),
         child: Row(
           children: [
+            SizedBox(width: 20),
             Flexible(
               flex: 3,
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium,
+              child: ConstrainedBox(
+                constraints:
+                    BoxConstraints(maxWidth: 100), // Adjust max width as needed
+                child: FittedBox(
+                  fit: BoxFit
+                      .scaleDown, // Scales text down to fit within available space
+                  alignment: Alignment.centerLeft, // Align text to the left
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ),
             SizedBox(width: 10), // Add some spacing
-            Flexible(
-              flex: 2,
+            Expanded(
+              // flex: 2,
               child: TextField(
                 focusNode: amountFocusNode,
                 controller: amountController,
@@ -63,14 +78,15 @@ class FormulaIngredientListItem extends StatelessWidget {
                   hintText: 'Amount (g)',
                   border: InputBorder.none,
                 ),
+                
                 onChanged: (value) {
-                  // Handle amount change
+                  onChangedAmount;
                 },
               ),
             ),
             SizedBox(width: 5), // Add some spacing
-            Flexible(
-              flex: 2,
+            Expanded(
+              // flex: 2,
               child: TextField(
                 focusNode: dilutionFocusNode,
                 controller: dilutionController,
@@ -81,15 +97,16 @@ class FormulaIngredientListItem extends StatelessWidget {
                   border: InputBorder.none,
                 ),
                 onChanged: (value) {
-                  // Handle dilution change
+                 onChangedDilution;
                 },
               ),
             ),
-            SizedBox(width: 5), // Add some spacing
+            SizedBox(width: 30), // Add some spacing
             Flexible(
+              flex: 3,
               child: Text(
                 'Rel: $relativeAmountText%',
-                overflow: TextOverflow.ellipsis,
+                // overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

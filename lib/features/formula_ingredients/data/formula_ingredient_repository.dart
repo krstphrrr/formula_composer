@@ -53,20 +53,28 @@ class FormulaIngredientRepository {
     }
   }
 
-  Future<void> updateIngredientInFormula(Map<String, dynamic> ingredient) async {
+  // Update a formula ingredient
+  Future<void> updateFormulaIngredient(int formulaId, int ingredientId, double amount, double dilution) async {
     final db = await DatabaseHelper().database;
+
+    print("updating ${ingredientId} with ${amount} and ${dilution} dil");
     try {
       await db.update(
         'formula_ingredients',
         {
-          'amount': ingredient['amount'],
-          'dilution': ingredient['dilution'],
+          'amount': amount,
+          'dilution': dilution,
         },
-        where: 'id = ?',
-        whereArgs: [ingredient['id']],
+        where: 'formula_id = ? AND ingredient_id = ?',
+        whereArgs: [formulaId, ingredientId],
       );
+      // if (kDebugMode) {
+        print("Formula ingredient updated successfully.");
+      // }
     } catch (e) {
-      print("Error updating ingredient in formula: $e");
+      // if (kDebugMode) {
+        print("Error updating formula ingredient: $e");
+      // }
     }
   }
 

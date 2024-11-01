@@ -16,9 +16,10 @@ class FormulaIngredientService {
     return await _repository.fetchIngredientById(ingredientId);
   }
 
-  Future<void> updateIngredientInFormula(int ingredientId, double amount, double dilution) async {
-    print("UPDATING IN SERVIUCE...");
-    await _repository.updateIngredient(ingredientId, amount, dilution);
+
+  Future<void> updateIngredientInFormula(int formulaId, int ingredientId, double amount, double dilution) async {
+    print("UPDATING FROM SERVICE");
+    await _repository.updateFormulaIngredient(formulaId, ingredientId, amount, dilution);
   }
 
   Future<void>  deleteFormulaIngredient(int formulaId, int ingredientId) async {
@@ -50,6 +51,7 @@ class FormulaIngredientService {
     double total = 0.0;
     for (var ingredient in formulaIngredients) {
       total += ingredient['amount'] * (ingredient['dilution'] ?? 1.0);
+      print("CALCULATING: ${total}");
     }
     return total;
   }
